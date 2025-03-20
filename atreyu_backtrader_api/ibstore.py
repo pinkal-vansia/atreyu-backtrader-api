@@ -1008,7 +1008,7 @@ class IBStore(with_metaclass(MetaSingleton, object)):
             # error and if not, the checks there will let it go
             if msg.reqId < self.REQIDBASE:
                 if self.broker is not None:
-                    self.broker.push_ordererror(msg)
+                    self.getbroker().push_ordererror(msg)
             else:
                 # Cancel the queue if a "data" reqId error is given: sanity
                 q = self.qs[msg.reqId]
@@ -1998,7 +1998,7 @@ class IBStore(with_metaclass(MetaSingleton, object)):
     
     def openOrder(self, msg):
         '''Receive the event ``openOrder`` events'''
-        self.broker.push_orderstate(msg)
+        self.getbroker().push_orderstate(msg)
     
     def openOrderEnd(self):
         # TODO: Add event to manage order requests 
@@ -2008,15 +2008,15 @@ class IBStore(with_metaclass(MetaSingleton, object)):
         '''Receive execDetails'''
         execution.shares = float(execution.shares)
         execution.cumQty = float(execution.cumQty)
-        self.broker.push_execution(execution)
+        self.getbroker().push_execution(execution)
     
     def orderStatus(self, msg):
         '''Receive the event ``orderStatus``'''
-        self.broker.push_orderstatus(msg)
+        self.getbroker().push_orderstatus(msg)
     
     def commissionReport(self, commissionReport):
         '''Receive the event commissionReport'''
-        self.broker.push_commissionreport(commissionReport)
+        self.getbroker().push_commissionreport(commissionReport)
 
     def reqPositions(self):
         '''Proxy to reqPositions'''
@@ -2043,7 +2043,7 @@ class IBStore(with_metaclass(MetaSingleton, object)):
 
                         self.notifs.put((err, (), {}))
 
-                    # self.broker.push_portupdate()
+                    # self.getbroker().push_portupdate()
             except Exception as e:
                 logger.exception(f"Exception: {e}")
 
@@ -2069,7 +2069,7 @@ class IBStore(with_metaclass(MetaSingleton, object)):
         self._event_accdownload.set()
         if False:
             if self.port_update:
-                self.broker.push_portupdate()
+                self.getbroker().push_portupdate()
 
                 self.port_update = False
 
@@ -2099,7 +2099,7 @@ class IBStore(with_metaclass(MetaSingleton, object)):
 
                     # Flag signal to broker at the end of account download
                     # self.port_update = True
-                    self.broker.push_portupdate()
+                    self.getbroker().push_portupdate()
             except Exception as e:
                 logger.exception(f"Exception: {e}")
 
